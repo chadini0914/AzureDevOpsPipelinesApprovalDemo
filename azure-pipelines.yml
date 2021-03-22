@@ -7,13 +7,33 @@ trigger:
 - master
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'windows-2019'
+
+variables:
+  BuildConfiguration: 'Release'
+
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  - task: DotNetCoreCLI@2
+    displayName: Restore (only name)
+    inputs:
+      command: restore
+  
+  - task: DotNetCoreCLI@2
+    displayName: Build (only name)
+    inputs:
+      arguments: '--configuration $(BuildConfiguration)'   #build into Relase env
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - task: DotNetCoreCLI@2
+    displayName: Publish (only name)
+    inputs:
+      command: publish
+      publishWebProjects: true
+      arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'  ##output as default dir to publish artifact into relase env
+      zipAfterPublish: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact (name only)'
+    inputs:
+      PathtoPublish: '$(build.artifactstagingdirectory)' #defaul location
+    condition: succeedOrFaild()
