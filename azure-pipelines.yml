@@ -36,4 +36,4 @@ steps:
     displayName: 'Publish Artifact (name only)'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)' #defaul location
-    condition: succeedOrFaild()
+    condition: succeedOrFailed()
